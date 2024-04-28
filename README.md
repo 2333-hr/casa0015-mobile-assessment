@@ -16,7 +16,7 @@ Are you ready to embark on a new journey of discovery, learning and experience w
 * 🔑A sleek login page for personalized experiences.
 * 📍A dynamic home screen that not only pinpoints your current location but also includes a search functionality to scope out landmarks within a specified range, say 20 km, from your position.
 * 🗺️A seamless display of nearby landmarks, neatly presented in both map and list formats, with each list entry providing real-time weather details like UV Index, temperature, precipitation, and more.
-* ℹ️Detailed information about each landmark is just a tap away, enhancing user engagement.
+* :sparkles:Detailed information about each landmark is just a tap away, enhancing user engagement.
 * 🌐A beautifully crafted landing page to introduce the app's concept and features.
 * 🧭Navigation to chosen landmarks, making trip planning an effortless task.
 

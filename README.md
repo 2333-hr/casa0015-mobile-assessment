@@ -1,4 +1,6 @@
-# REPLACE WITH YOUR APP NAME
+# Landmark Hopper
+<img width="358" alt="image" src="https://github.com/2333-hr/casa0015-mobile-assessment/assets/146243657/6cb66034-6d6b-4ef5-b472-6b38f770da4e">
+
 
 This is the Final assessment template for CASA0014 - Please use this template and edit the relevant sections to personalise.
 This section has a short introduction to what the application is

@@ -1,8 +1,0 @@
-flutter create city_landmarks_search
-cd city_landmarks_search
-#pubspec.yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  google_maps_flutter: ^2.0.6
-  geolocator: ^7.3.1

@@ -5,6 +5,11 @@
 
 This is the Final assessment template for CASA0014 - Please use this template and edit the relevant sections to personalise.
 This section has a short introduction to what the application is
+Landmark Hopper is an APP for city landmark visitors. Its intuitive user interface shows users the geographical coordinates of their current location and displays landmarks within a selected range through a built-in search function. Not only that, each landmark is accompanied by real-time weather information such as UV intensity, temperature, precipitation rate, and the specific location of these landmarks on Google Maps, providing users with instant and detailed local information.*
+
+We also encountered challenges while writing this app. In particular, integrating multiple APIs—Google Maps and OpenMeteo—into a cooperating whole requires precise coding and careful design. The result is an app that can be easily deployed across multiple platforms, giving users a consistently high-quality experience whether they are using Android, iOS, or a web browser.*
+
+Are you ready to embark on a new journey of discovery, learning and experience with Landmark Hopper? Download the experience now and start your landmark hopping journey.
 
 ## Use this README File 
 

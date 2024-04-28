@@ -9,6 +9,18 @@ We also encountered challenges while writing this app. In particular, integratin
 
 Are you ready to embark on a new journey of discovery, learning and experience with Landmark Hopper? Download the experience now and start your landmark hopping journey.
 
+## Highlights
+
+"Landmark Hopper" is an app designed to enhance your travel experience by providing a vivid and engaging platform to discover landmarks within your vicinity. Highlighting the innovative use of Google Maps API and Open Meteo API, the app boasts several impressive features:
+
+* A sleek login page for personalized experiences.
+* A dynamic home screen that not only pinpoints your current location but also includes a search functionality to scope out landmarks within a specified range, say 20 km, from your position.
+* A seamless display of nearby landmarks, neatly presented in both map and list formats, with each list entry providing real-time weather details like UV Index, temperature, precipitation, and more.
+* Detailed information about each landmark is just a tap away, enhancing user engagement.
+* A beautifully crafted landing page to introduce the app's concept and features.
+* Navigation to chosen landmarks, making trip planning an effortless task.
+Landmark Hopper is not just an app; it's your travel companion, making each journey an adventure worth cherishing.
+
 ## Use this README File 
 
 Use this section to show us what your Mobile App is about.   Include a Screenshot to the App, link to the various frameworks you've used. Include your presentation video here that shows off your Mobile App.   Emojis are also fun to include 📱 😄

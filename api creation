@@ -1,9 +1,0 @@
-#andriod
-<meta-data
-    android:name="com.google.android.geo.API_KEY"
-    android:value="您的API密钥" />
-#ios
-import GoogleMaps
-GMSServices.provideAPIKey("您的API密钥")
-#web
-<script src="https://maps.googleapis.com/maps/api/js?key=您的API密钥"></script>

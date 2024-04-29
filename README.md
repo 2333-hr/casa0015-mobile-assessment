@@ -38,5 +38,4 @@ Look at some other Flutter Apps online and see how they use there README File.  
 Include a section that gives intructions on how to install the app or run it in Flutter.  What versions of the plugins are you assuming?  Maybe define a licence
 
 ##  Contact Details
-
-
+ucfnhy0@ucl.ac.uk

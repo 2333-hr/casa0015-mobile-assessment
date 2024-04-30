@@ -15,7 +15,7 @@ GitHub Repository - [https://github.com/2333-hr/casa0015-mobile-assessment](http
 
 ## Introduction to Application
 
-Location Log is an innovative mobile app designed to enhance the experience of travel enthusiasts and journaling enthusiasts by enabling them to record and revisit their favorite locations. The app allows users to manually explore locations of their interest in different map modes, with each included location divided into favorites, visited or wish list collections. In addition, the APP allows users to give personalized names and descriptions to the included places, so that users can have a personalized place collection experience.
+Location Logbook is an innovative mobile app designed to enhance the experience of travel enthusiasts and journaling enthusiasts by enabling them to record and revisit their favorite locations. The app allows users to manually explore locations of their interest in different map modes, with each included location divided into favorites, visited or wish list collections. In addition, the APP allows users to give personalized names and descriptions to the included places, so that users can have a personalized place collection experience.
 
 The application leverages the functionality of Google Maps for map rendering. With location logs, users can seamlessly navigate between different map views, enhancing their interaction with geography. The intuitive interface supports quick searches within saved collections, making it easy to find and organize places of interest and see if a place is included.
 

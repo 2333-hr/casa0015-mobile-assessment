@@ -12,12 +12,17 @@ Ready to embark on a journey of discovery, memories, and endless exploration? Do
 
 "Location Logbook" revolutionizes your exploration experience with its remarkable features:
 
-🌍 Place Collections: Easily search for places directly from the map and add them to your personalized collections - Favorites, Visited or Wish List.\n
-🗺️Map Mode Diversity: Explore styles with three different Google Maps modes, providing a diverse viewing experience based on your preferences.\n
-🎨 Customization options: Personalize your collection of places with custom names, descriptions and stars to make each one unique.\n
-🛰️Location permissions: Seamlessly obtain location permissions to ensure smooth acquisition of your current whereabouts and enhanced functions.\n
-🔍 Efficient Search: Use the search bar to easily find your included treasure locations.\n
-⭐ Detailed Place Insights: Drill down into each location with comprehensive details, including name, precise coordinates, and the option to navigate to the Google Places page for more information.\n
+🌍 Place Collections: Easily search for places directly from the map and add them to your personalized collections - Favorites, Visited or Wish List.
+
+🗺️Map Mode Diversity: Explore styles with three different Google Maps modes, providing a diverse viewing experience based on your preferences.
+
+🎨 Customization options: Personalize your collection of places with custom names, descriptions and stars to make each one unique.
+
+🛰️Location permissions: Seamlessly obtain location permissions to ensure smooth acquisition of your current whereabouts and enhanced functions.
+
+🔍 Efficient Search: Use the search bar to easily find your included treasure locations.
+
+⭐ Detailed Place Insights: Drill down into each location with comprehensive details, including name, precise coordinates, and the option to navigate to the Google Places page for more information.
 
 With Location Logbook, your exploration journey will reach new heights. Download now and start collecting unforgettable memories!
 

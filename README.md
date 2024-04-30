@@ -29,6 +29,10 @@ With Location Logbook, your exploration journey will reach new heights. Download
 ## Vedio display
 [demo vedio](https://github.com/2333-hr/casa0015-mobile-assessment/blob/main/demo%20vedio.mp4)
 
+## pages display
+![image](https://github.com/2333-hr/casa0015-mobile-assessment/assets/146243657/c0460589-33ec-43e8-a853-b5b9214bd52c)
+
+
 ## Prepare in advance: link to various frameworks
 * Flutter: [Flutter Official Website](https://flutter.dev/)
 Flutter is Google's UI toolkit for building natively compiled applications for mobile, web, and desktop from a single codebase. You can find documentation, samples, and other resources on the official Flutter website.

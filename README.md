@@ -4,7 +4,7 @@
 
 Introducing Location Logbook! Whether you're a seasoned traveler or an urban explorer, this app is your ultimate companion for documenting and exploring your favorite spots. With its intuitive interface, you can easily mark your current location and add it to your personalized logbook. But that's not all! Dive deeper into each location with real-time weather updates, customizable descriptions, and even star ratings.
 
-However, crafting this app wasn't all smooth sailing. We faced the challenge of seamlessly integrating various APIs, including Google Maps and Open Meteo, to create a seamless user experience. But through meticulous coding and innovative design, we've created an app that seamlessly transitions across platforms, ensuring you have a top-notch experience whether you're on your phone or browsing the web.
+However, crafting this app wasn't all smooth sailing. We faced the challenge of seamlessly integrating various APIs, including Google Maps and Open Meteo（trying...）, to create a seamless user experience. But through meticulous coding and innovative design, we've created an app that seamlessly transitions across platforms, ensuring you have a top-notch experience whether you're on your phone or browsing the web.
 
 Ready to embark on a journey of discovery, memories, and endless exploration? Download Location Logbook now and start your adventure today!
 

@@ -1,0 +1,412 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+
+// Import custom files
+import 'place.dart';
+import 'place_details.dart';
+import 'place_map.dart';
+import 'stub_data.dart';
+
+// Place tracking application class
+enum PlaceTrackerViewType {
+  map,
+  list,
+}
+
+class PlaceTrackerApp extends StatelessWidget {
+  const PlaceTrackerApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.green[700],
+          foregroundColor: Colors.white,
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Colors.green[700],
+          foregroundColor: Colors.white,
+        ),
+      ),
+      routerConfig: GoRouter(routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => const _PlaceTrackerHomePage(),
+          routes: [
+            GoRoute(
+              path: 'place/:id',
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                final place = context.read<AppState>().places.singleWhere((place) => place.id == id);
+                return PlaceDetails(place: place);
+              },
+            ),
+          ],
+        ),
+      ]),
+    );
+  }
+}
+
+// Place tracking homepage
+class _PlaceTrackerHomePage extends StatelessWidget {
+  const _PlaceTrackerHomePage();
+
+  @override
+  Widget build(BuildContext context) {
+    var state = Provider.of<AppState>(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: const Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+              child: Icon(Icons.pin_drop, size: 24.0),
+            ),
+            Text('Location Logbook'),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 0.0, 16.0, 0.0),
+            child: IconButton(
+              icon: Icon(
+                state.viewType == PlaceTrackerViewType.map
+                    ? Icons.list
+                    : Icons.map,
+                size: 32.0,
+              ),
+              onPressed: () {
+                state.setViewType(
+                  state.viewType == PlaceTrackerViewType.map
+                      ? PlaceTrackerViewType.list
+                      : PlaceTrackerViewType.map,
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () async {
+                final Place? selectedPlace = await showPlaceSearch(context);
+                if (selectedPlace != null) {
+                  goToPlace(context, selectedPlace);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+      body: IndexedStack(
+        index: state.viewType == PlaceTrackerViewType.map ? 0 : 1,
+        children: const [
+          PlaceMap(center: LatLng(45.521563, -122.677433)),
+          _PlaceListView(),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _getCurrentLocation(context);
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  // Get current location
+  void _getCurrentLocation(BuildContext context) async {
+  print('Requesting location permission...');
+  LocationPermission permission = await Geolocator.requestPermission();
+  if (permission == LocationPermission.always ||
+      permission == LocationPermission.whileInUse) {
+    print('Location permission granted');
+    print('Getting current position...');
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    print('Current position: $position');
+    final place = Place(
+      id: UniqueKey().toString(),
+      latLng: LatLng(position.latitude, position.longitude),
+      name: 'New Place',
+      category: PlaceCategory.visited,
+    );
+    print('Adding new place: $place');
+    context.read<AppState>().setPlaces([...context.read<AppState>().places, place]);
+
+    // Fetch weather data
+    print('Fetching weather data...');
+    _fetchWeatherData(position.latitude, position.longitude, context);
+  } else {
+    print('Location permission not granted');
+  }
+}
+
+// Fetch weather data from API
+void _fetchWeatherData(double latitude, double longitude, BuildContext context) async {
+  // Construct request URL
+  final url = Uri.parse('https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,precipitation,rain,showers,snowfall');
+
+  try {
+    // Execute HTTP GET request
+    final response = await http.get(url);
+
+    // Check response status code
+    if (response.statusCode == 200) {
+      // Parse response data
+      final jsonData = jsonDecode(response.body);
+      final Map<String, dynamic> currentData = jsonData['current'] as Map<String, dynamic>;
+
+      // Extract weather data from response
+      double temperature = _toDouble(currentData['temperature_2m']);
+      double humidity = _toDouble(currentData['relative_humidity_2m']);
+      double precipitation = _toDouble(currentData['precipitation']);
+      double rain = _toDouble(currentData['rain']);
+      double showers = _toDouble(currentData['showers']);
+      double snowfall = _toDouble(currentData['snowfall']);
+
+      // Show weather dialog
+      _showWeatherDialog(context, temperature, humidity, precipitation, rain, showers, snowfall);
+    } else {
+      print('Failed to fetch weather data: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error fetching weather data: $error');
+  }
+}
+
+// Convert value to double, safely handle possible null values
+double _toDouble(dynamic value) {
+  if (value == null) {
+    return 0.0;
+  }
+  return double.tryParse(value.toString()) ?? 0.0;
+}
+
+// Show weather dialog with weather information
+void _showWeatherDialog(
+    BuildContext context,
+    double temperature,
+    double humidity,
+    double precipitation,
+    double rain,
+    double showers,
+    double snowfall) {
+  showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Weather Information'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: [
+              Text('Temperature: ${temperature.toStringAsFixed(1)}°C'),
+              Text('Humidity: ${humidity.toStringAsFixed(1)}%'),
+              Text('Precipitation: ${precipitation.toStringAsFixed(1)} mm'),
+              Text('Rain: ${rain.toStringAsFixed(1)} mm'),
+              Text('Showers: ${showers.toStringAsFixed(1)} mm'),
+              Text('Snowfall: ${snowfall.toStringAsFixed(1)} cm'),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Close'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+// Show place search dialog
+Future<Place?> showPlaceSearch(BuildContext context) async {
+  TextEditingController searchController = TextEditingController();
+  return showDialog<Place?>( // Add type parameter
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Search Place'),
+        content: TextField(
+          controller: searchController,
+          decoration: const InputDecoration(
+            hintText: 'Enter a place name',
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Search'),
+            onPressed: () async {
+              final query = searchController.text;
+              if (query.isNotEmpty) {
+                final List<Place> searchResults = await searchPlace(query, context.read<AppState>().places);
+                Navigator.of(context).pop(await showDialog<Place?>( // Add type parameter
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text('Search Results'),
+                      content: SingleChildScrollView(
+                        child: Column(
+                          children: searchResults.isNotEmpty
+                              ? searchResults.map((place) {
+                                return ListTile(
+                                  title: Text(place.name),
+                                  onTap: () {
+                                    Navigator.of(context).pop(place);
+                                  },
+                                );
+                              }).toList()
+                              : [
+                                const ListTile(
+                                  title: Text('Waiting for your exploration'),
+                                ),
+                              ],
+                        ),
+                      ),
+                    );
+                  },
+                ));
+              }
+            },
+          ),
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+// Search for places based on query
+Future<List<Place>> searchPlace(String query, List<Place> places) async {
+    List<Place> searchResults = places.where((place) => place.name.toLowerCase().contains(query.toLowerCase())).toList();
+    return searchResults;
+  }
+
+// Navigate to selected place
+void goToPlace(BuildContext context, Place place) {
+    print('Selected Place: ${place.name}, Lat: ${place.latLng.latitude}, Lng: ${place.latLng.longitude}');
+  }
+}
+
+// Place list view
+class _PlaceListView extends StatelessWidget {
+  const _PlaceListView();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        PlaceList(category: PlaceCategory.visited),
+        PlaceList(category: PlaceCategory.favorite),
+        PlaceList(category: PlaceCategory.wantToGo),
+      ],
+    );
+  }
+}
+
+// Place list widget
+class PlaceList extends StatelessWidget {
+  final PlaceCategory category;
+
+  const PlaceList({required this.category});
+
+  @override
+  Widget build(BuildContext context) {
+    var places = Provider.of<AppState>(context).places;
+    var filteredPlaces = places.where((place) => place.category == category).toList();
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ClampingScrollPhysics(),
+      itemCount: filteredPlaces.length,
+      itemBuilder: (context, index) {
+        final place = filteredPlaces[index];
+        return ListTile(
+          title: Text(place.name),
+          subtitle: Text(place.category.toString()),
+          trailing: IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              context.read<AppState>().removePlace(place);
+            },
+          ),
+          onTap: () {
+            GoRouter.of(context).go('/place/${place.id}');
+          },
+        );
+      },
+    );
+  }
+}
+
+// Application state
+class AppState extends ChangeNotifier {
+  AppState({
+    this.places = StubData.places,
+    this.selectedCategory = PlaceCategory.favorite,
+    this.viewType = PlaceTrackerViewType.map,
+  });
+
+  List<Place> places;
+  PlaceCategory selectedCategory;
+  PlaceTrackerViewType viewType;
+
+  // Set view type
+  void setViewType(PlaceTrackerViewType viewType) {
+    this.viewType = viewType;
+    notifyListeners();
+  }
+
+  // Set selected category
+  void setSelectedCategory(PlaceCategory newCategory) {
+    selectedCategory = newCategory;
+    notifyListeners();
+  }
+
+  // Set places
+  void setPlaces(List<Place> newPlaces) {
+    places = newPlaces;
+    notifyListeners();
+  }
+
+  // Remove place
+  void removePlace(Place place) {
+    places.remove(place);
+    notifyListeners();
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is AppState &&
+        other.places == places &&
+        other.selectedCategory == selectedCategory &&
+        other.viewType == viewType;
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(places, selectedCategory, viewType);
+}
+
+// Main function
+void main() {
+  runApp(ChangeNotifierProvider(
+    create: (context) => AppState(),
+    child: PlaceTrackerApp(),
+  ));
+}

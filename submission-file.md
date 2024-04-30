@@ -23,11 +23,11 @@ Overall, Location Log is not only a tool but a companion for anyone who is passi
 
 ## Biblography
 
-1. Google Developers. (No year). Google Maps Platform Documentation. [Online] Available at: https://developers.google.com/maps/documentation [Accessed 7 April 2024].
+1. Dart Team. (No year). Dart Programming Language. [Online] Available at: https://dart.dev/guides [Accessed 11 April 2024].
 2. Flutter Team. (No year). Flutter Documentation. [Online] Available at: https://flutter.dev/docs [Accessed 7 April 2024].
-3. Meteostat Developers. (No year). Open Meteo Data. [Online] Available at: https://open-meteo.com/ [Accessed 11 April 2024].
-4. Dart Team. (No year). Dart Programming Language. [Online] Available at: https://dart.dev/guides [Accessed 11 April 2024].
-
+3. Google Developers. (No year). Google Maps Platform Documentation. [Online] Available at: https://developers.google.com/maps/documentation [Accessed 7 April 2024].
+4. Meteostat Developers. (No year). Open Meteo Data. [Online] Available at: https://open-meteo.com/ [Accessed 11 April 2024]
+   
 ## Declaration of Authorship
 
 I, Huarui Yang, confirm that the work presented in this assessment is my own. Where information has been derived from other sources, I confirm that this has been indicated in the work.

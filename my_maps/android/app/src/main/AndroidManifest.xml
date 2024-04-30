@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:label="place_tracker"
         android:name="${applicationName}"
@@ -8,7 +10,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyD8eO6TD1XmUUUFU15hpd5xKl9vddtPTqY" />
+            android:value="*************" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

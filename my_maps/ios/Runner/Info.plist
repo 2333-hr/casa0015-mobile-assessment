@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
     <key>NSLocationAlwaysUsageDescription</key>
-    <string>App需要始终访问您的位置信息以提供相关服务</string>
+    <string>AppNeed to always access your location information to provide related services</string>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Your location is needed to show nearby places.</string>
 	<key>CFBundleDevelopmentRegion</key>

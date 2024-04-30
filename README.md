@@ -52,6 +52,10 @@ Google Maps Flutter is a plugin for integrating Google Maps into Flutter applica
 2. Run the flutter install command in the terminal to install the app on the connected iOS device.
 ## Other Dependencies
 * In addition to the listed plugins, this app may have other dependencies on Flutter plugins or third-party libraries. Please refer to the dependencies section in the pubspec.yaml file for a complete list of dependencies.
+
+## Lincese
+* BSD-style license
+* 
   
 ##  Contact Details
 ucfnhy0@ucl.ac.uk

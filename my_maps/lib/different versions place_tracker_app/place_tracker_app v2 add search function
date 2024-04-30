@@ -1,0 +1,271 @@
+// Import Flutter framework and related packages
+import 'package:flutter/material.dart'; // Import Flutter core package
+import 'package:go_router/go_router.dart'; // Import Go Router package
+import 'package:google_maps_flutter/google_maps_flutter.dart'; // Import Google Maps plugin
+import 'package:provider/provider.dart'; // Import Provider package
+import 'package:geolocator/geolocator.dart'; // Import location plugin
+
+// Import custom files
+import 'place.dart'; // Import place data model
+import 'place_details.dart'; // Import place details page
+import 'place_list.dart'; // Import place list page
+import 'place_map.dart'; // Import map page
+import 'stub_data.dart'; // Import static data
+
+// Place tracker application class
+enum PlaceTrackerViewType { // Define enum to represent place tracker view types
+  map, // Map view
+  list, // List view
+}
+
+class PlaceTrackerApp extends StatelessWidget { // Place tracker application class
+  const PlaceTrackerApp({Key? key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      theme: ThemeData( // Set application theme
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green), // Set color scheme
+        appBarTheme: AppBarTheme( // Set app bar theme
+          backgroundColor: Colors.green[700], // Set app bar background color
+          foregroundColor: Colors.white, // Set app bar foreground color
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData( // Set floating action button theme
+          backgroundColor: Colors.green[700], // Set floating action button background color
+          foregroundColor: Colors.white, // Set floating action button foreground color
+        ),
+      ),
+      routerConfig: GoRouter(routes: [ // Set router configuration
+        GoRoute( // Define root route
+          path: '/', // Path is root path
+          builder: (context, state) => const _PlaceTrackerHomePage(), // Build root page
+          routes: [
+            GoRoute( // Define place details page route
+              path: 'place/:id', // Path includes place ID
+              builder: (context, state) {
+                final id = state.pathParameters['id']!; // Get place ID
+                final place = context // Get corresponding place information based on place ID
+                    .read<AppState>()
+                    .places
+                    .singleWhere((place) => place.id == id);
+                return PlaceDetails(place: place); // Return place details page
+              },
+            ),
+          ],
+        ),
+      ]),
+    );
+  }
+}
+
+// Place tracker home page
+class _PlaceTrackerHomePage extends StatelessWidget {
+  const _PlaceTrackerHomePage();
+
+  @override
+  Widget build(BuildContext context) {
+    var state = Provider.of<AppState>(context); // Get state manager
+    return Scaffold(
+      appBar: AppBar( // App bar
+        title: const Row( // Title row
+          crossAxisAlignment: CrossAxisAlignment.center, // Cross axis alignment
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+              child: Icon(Icons.pin_drop, size: 24.0), // Map icon
+            ),
+            Text('Google Maps'), // Title text
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 0.0, 16.0, 0.0),
+            child: IconButton( // Icon button
+              icon: Icon(
+                state.viewType == PlaceTrackerViewType.map // Determine icon based on view type
+                    ? Icons.list
+                    : Icons.map,
+                size: 32.0,
+              ),
+              onPressed: () {
+                state.setViewType( // Toggle view type
+                  state.viewType == PlaceTrackerViewType.map
+                      ? PlaceTrackerViewType.list
+                      : PlaceTrackerViewType.map,
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () async {
+                final Place? selectedPlace = await showPlaceSearch(context);
+                if (selectedPlace != null) {
+                  goToPlace(context, selectedPlace);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+      body: IndexedStack( // Indexed stack layout
+        index: state.viewType == PlaceTrackerViewType.map ? 0 : 1, // Select page to display based on view type
+        children: const [
+          PlaceMap(center: LatLng(45.521563, -122.677433)), // Map page
+          PlaceList(), // List page
+        ],
+      ),
+      floatingActionButton: FloatingActionButton( // Floating action button
+        onPressed: () {
+          // Add place button click event
+          _getCurrentLocation(context);
+        },
+        child: Icon(Icons.add), // Button icon
+      ),
+    );
+  }
+
+  // Get current location and add place
+  void _getCurrentLocation(BuildContext context) async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      final place = Place(
+        id: UniqueKey().toString(),
+        latLng: LatLng(position.latitude, position.longitude),
+        name: 'New Place',
+        category: PlaceCategory.favorite,
+      );
+      context.read<AppState>().setPlaces([...context.read<AppState>().places, place]);
+    }
+  }
+
+  // Show place search dialog
+  Future<Place?> showPlaceSearch(BuildContext context) async {
+    TextEditingController searchController = TextEditingController();
+    return showDialog<Place>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Search Place'),
+          content: TextField(
+            controller: searchController,
+            decoration: InputDecoration(
+              hintText: 'Enter a place name',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Search'),
+              onPressed: () async {
+                final query = searchController.text;
+                if (query.isNotEmpty) {
+                  final List<Place> searchResults = await searchPlace(query, context.read<AppState>().places);
+                  Navigator.of(context).pop(await showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Search Results'),
+                        content: SingleChildScrollView(
+                          child: Column(
+                            children: searchResults.isNotEmpty
+                                ? searchResults.map((place) {
+                                    return ListTile(
+                                      title: Text(place.name),
+                                      onTap: () {
+                                        Navigator.of(context).pop(place);
+                                      },
+                                    );
+                                  }).toList()
+                                : [
+                                    ListTile(
+                                      title: Text('Waiting for your exploration'),
+                                    ),
+                                  ],
+                          ),
+                        ),
+                      );
+                    },
+                  ));
+                }
+              },
+            ),
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Search for places
+  Future<List<Place>> searchPlace(String query, List<Place> places) async {
+    // Filter places containing the keyword
+    List<Place> searchResults = places.where((place) => place.name.toLowerCase().contains(query.toLowerCase())).toList();
+    return searchResults;
+  }
+
+  // Go to place
+  void goToPlace(BuildContext context, Place place) {
+    // Implement logic to navigate to place here, can navigate to specified place using routes, etc.
+    // This is just an example, actual implementation depends on specific requirements
+    // Print found place information for now
+    print('Selected Place: ${place.name}, Lat: ${place.latLng.latitude}, Lng: ${place.latLng.longitude}');
+  }
+}
+
+// Application state management class
+class AppState extends ChangeNotifier { // Application state management class
+  AppState({
+    this.places = StubData.places, // Place list, default to static data
+    this.selectedCategory = PlaceCategory.favorite, // Default selected place category
+    this.viewType = PlaceTrackerViewType.map, // Default view type is map
+  });
+
+  List<Place> places; // Place list
+  PlaceCategory selectedCategory; // Selected place category
+  PlaceTrackerViewType viewType; // View type
+
+  void setViewType(PlaceTrackerViewType viewType) { // Set view type
+    this.viewType = viewType;
+    notifyListeners(); // Notify dependent components to update
+  }
+
+  void setSelectedCategory(PlaceCategory newCategory) { // Set selected place category
+    selectedCategory = newCategory;
+    notifyListeners(); // Notify dependent components to update
+  }
+
+  void setPlaces(List<Place> newPlaces) { // Set place list
+    places = newPlaces;
+    notifyListeners(); // Notify dependent components to update
+  }
+
+  @override
+  bool operator ==(Object other) { // Check if objects are equal
+    if (identical(this, other)) return true;
+    return other is AppState && // Check if other object is of type AppState and fields are equal
+        other.places == places &&
+        other.selectedCategory == selectedCategory &&
+        other.viewType == viewType;
+  }
+
+  @override
+  int get hashCode => // Hash code calculation method
+      Object.hash(places, selectedCategory, viewType); // Calculate hash value
+}
+
+void main() {
+  runApp(ChangeNotifierProvider( // Wrap application with Provider
+    create: (context) => AppState(), // Create application state
+    child: PlaceTrackerApp(), // Application entry
+  ));
+}

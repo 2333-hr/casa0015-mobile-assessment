@@ -58,7 +58,6 @@ Google Maps Flutter is a plugin for integrating Google Maps into Flutter applica
 
 ## Lincese
 * BSD-style license
-* 
   
 ##  Contact Details
 ucfnhy0@ucl.ac.uk

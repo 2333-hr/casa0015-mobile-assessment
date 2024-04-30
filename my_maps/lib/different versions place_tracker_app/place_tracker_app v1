@@ -1,0 +1,219 @@
+// Copyright Statement and License Agreement
+// This source code is governed by the BSD-style license agreement, and detailed information about the license agreement can be found in the LICENSE file.
+
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'dart:async';
+
+import 'place.dart';
+import 'place_details.dart';
+import 'place_list.dart';
+import 'place_map.dart';
+import 'stub_data.dart';
+import 'package:geolocator/geolocator.dart';
+
+// Place tracking application class
+enum PlaceTrackerViewType {
+  map, // Map view
+  list, // List view
+}
+
+// Place tracking application
+class PlaceTrackerApp extends StatelessWidget {
+  const PlaceTrackerApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
+      ),
+      routerConfig: GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const _PlaceTrackerHomePage(),
+            routes: [
+              GoRoute(
+                path: 'place/:id',
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  final place = context
+                      .read<AppState>()
+                      .places
+                      .singleWhere((place) => place.id == id);
+                  return PlaceDetails(place: place);
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Place tracking home page
+class _PlaceTrackerHomePage extends StatelessWidget {
+  const _PlaceTrackerHomePage();
+
+  @override
+  Widget build(BuildContext context) {
+    var state = Provider.of<AppState>(context);
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0.0, 0.0, 8.0, 0.0),
+              child: const Icon(Icons.pin_drop, size: 24.0), // Map icon
+            ),
+            const Text('Google Maps'), // Title text
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 0.0, 16.0, 0.0),
+            child: IconButton(
+              icon: Icon(
+                state.viewType == PlaceTrackerViewType.map
+                    ? Icons.list
+                    : Icons.map,
+                size: 32.0,
+              ),
+              onPressed: () {
+                state.setViewType(
+                  state.viewType == PlaceTrackerViewType.map
+                      ? PlaceTrackerViewType.list
+                      : PlaceTrackerViewType.map,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      body: IndexedStack(
+        index: state.viewType == PlaceTrackerViewType.map ? 0 : 1,
+        children: const [
+          PlaceMap(center: LatLng(45.521563, -122.677433)), // Map page
+          PlaceList(), // List page
+        ],
+      ),
+    );
+  }
+}
+
+// Application state management class
+class AppState extends ChangeNotifier {
+  AppState({
+    this.places = StubData.places,
+    this.selectedCategory = PlaceCategory.favorite,
+    this.viewType = PlaceTrackerViewType.map,
+  });
+
+  List<Place> places; // List of places
+  PlaceCategory selectedCategory; // Selected place category
+  PlaceTrackerViewType viewType; // View type
+
+  void setViewType(PlaceTrackerViewType viewType) {
+    this.viewType = viewType;
+    notifyListeners();
+  }
+
+  void setSelectedCategory(PlaceCategory newCategory) {
+    selectedCategory = newCategory;
+    notifyListeners();
+  }
+
+  void setPlaces(List<Place> newPlaces) {
+    places = newPlaces;
+    notifyListeners();
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is AppState &&
+        other.places == places &&
+        other.selectedCategory == selectedCategory &&
+        other.viewType == viewType;
+  }
+
+  @override
+  int get hashCode => Object.hash(places, selectedCategory, viewType);
+}
+
+// Place tracking map
+class PlaceMap extends StatefulWidget {
+  final LatLng center;
+
+  const PlaceMap({Key? key, required this.center}) : super(key: key);
+
+  @override
+  _PlaceMapState createState() => _PlaceMapState();
+}
+
+// Place tracking map state
+class _PlaceMapState extends State<PlaceMap> {
+  Completer<GoogleMapController> _controller = Completer();
+  late LatLng _currentPosition; // User's current position
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation(); // Get user's current location
+  }
+
+  // Get user's current location
+  Future<void> _getCurrentLocation() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        _currentPosition = LatLng(position.latitude, position.longitude);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GoogleMap(
+      mapType: MapType.normal,
+      initialCameraPosition: CameraPosition(
+        target: widget.center, // Initial center position
+        zoom: 14.0, // Initial zoom level
+      ),
+      myLocationEnabled: true, // Enable my location button
+      myLocationButtonEnabled: true, // Enable my location button
+      onMapCreated: (GoogleMapController controller) {
+        _controller.complete(controller);
+      },
+      markers: _currentPosition == null // If user's current position is null, do not show markers
+          ? Set<Marker>.of([])
+          : {
+              Marker(
+                markerId: MarkerId('current_position'),
+                position: _currentPosition,
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                    BitmapDescriptor.hueAzure),
+                infoWindow: InfoWindow(
+                  title: 'Current Position',
+                ),
+              ),
+            }.toSet(),
+    );
+  }
+}

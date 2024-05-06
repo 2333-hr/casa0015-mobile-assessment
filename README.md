@@ -43,7 +43,7 @@ Google Maps Flutter is a plugin for integrating Google Maps into Flutter applica
 
 ## Installation Guide
 
-###Running the App in the Flutter Environment
+### Running the App in the Flutter Environment
 1. Make sure you have Flutter SDK installed. You can find installation instructions on the official Flutter website.
 2. Clone or download the code of this project to your local environment.
 3. Navigate to the root directory of the project using the command line.

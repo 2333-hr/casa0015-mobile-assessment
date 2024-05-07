@@ -18,6 +18,9 @@ dependencies:
   collection: ^1.16.0
   http: ^0.13.3 # 添加 http 包
   geolocator: ^7.6.0 # 确认当前版本号
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+#  location: ^4.3.0
 
 
 dev_dependencies:
